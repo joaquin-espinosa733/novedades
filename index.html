@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Novedades</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Novedades - Fullscreen Slider</title>
 
     <!-- Blaze Slider CSS -->
     <link
@@ -11,62 +11,194 @@
       href="https://unpkg.com/blaze-slider@latest/dist/blaze.css"
     />
 
-    <!-- Tus estilos personalizados -->
+    <!-- Tus estilos -->
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="blaze-slider">
+    <div class="blaze-slider" id="news-slider">
       <div class="blaze-container">
         <div class="blaze-track">
+          <!-- SLIDE 1 - imagen -->
           <div class="slide">
-            <h2>
-              📰 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-            </h2>
-            <p>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Aspernatur nam mollitia voluptas tenetur, tempore doloremque
-              maxime
-            </p>
+            <img
+              class="slide-media"
+              src="./assets/img/resizer (2).webp"
+              alt="Slide imagen 1"
+              loading="lazy"
+            />
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon">📰</div>
+              <h2>Lorem ipsum dolor sit amet consectetur.</h2>
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
+                facilisi. Morbi luctus, magna a iaculis tempor, velit sem
+                fringilla urna.
+              </p>
+            </div>
           </div>
 
+          <!-- SLIDE 2 - video -->
           <div class="slide">
-            <h2>
-              📅 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-            </h2>
-            <p>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Aspernatur nam mollitia voluptas tenetur, tempore doloremque
-              maxime
-            </p>
+            <video
+              class="slide-media"
+              playsinline
+              muted
+              preload="metadata"
+              loop
+              src="./assets/img/prueba.mp4"
+            ></video>
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon">📅</div>
+              <h2>Praesent commodo cursus magna vel.</h2>
+              <p>
+                Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor
+                auctor. Etiam porta sem malesuada magna mollis euismod.
+              </p>
+            </div>
           </div>
 
+          <!-- SLIDE 3 - imagen -->
           <div class="slide">
-            <h2>
-              💼 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-            </h2>
-            <p>
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Aspernatur nam mollitia voluptas tenetur, tempore doloremque
-              maxime
-            </p>
+            <img
+              class="slide-media"
+              src="./assets/img/resizer.webp"
+              alt="Slide imagen 3"
+              loading="lazy"
+            />
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon">💼</div>
+              <h2>Donec ullamcorper nulla non metus auctor.</h2>
+              <p>
+                Cras justo odio, dapibus ac facilisis in, egestas eget quam.
+                Curabitur blandit tempus porttitor. Integer posuere erat a ante.
+              </p>
+            </div>
           </div>
+
+          <!-- Podés agregar más slides aquí (imagen o video) -->
         </div>
       </div>
     </div>
 
-    <!-- Blaze Slider JS -->
+    <!-- Blaze Slider JS (production) -->
     <script src="https://unpkg.com/blaze-slider@latest/dist/blaze-slider.min.js"></script>
 
     <script>
-      new BlazeSlider(document.querySelector(".blaze-slider"), {
+      // Inicializa Blaze
+      const sliderEl = document.querySelector("#news-slider");
+      const blaze = new BlazeSlider(sliderEl, {
         all: {
           loop: true,
           slidesToShow: 1,
-          transitionDuration: 1000,
+          transitionDuration: 800,
           autoplay: true,
-          autoplayInterval: 5000,
+          autoplayInterval: 7000,
           stopAutoplayOnInteraction: false,
         },
+      });
+
+      // Manejo de reproducción de videos por visibilidad
+      // Observamos cada .slide; cuando su intersección > 0.6 lo consideramos visible.
+      const slides = Array.from(document.querySelectorAll(".slide"));
+
+      const options = {
+        root: null,
+        rootMargin: "0px",
+        threshold: buildThresholdList(),
+      };
+
+      function buildThresholdList() {
+        // lista de thresholds para mayor precisión
+        const thresholds = [];
+        for (let i = 0; i <= 1.0; i += 0.05) {
+          thresholds.push(i);
+        }
+        return thresholds;
+      }
+
+      let currentVisibleSlide = null;
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const slide = entry.target;
+          // Si está mayormente visible:
+          if (entry.intersectionRatio >= 0.6) {
+            // marcar como visible
+            if (currentVisibleSlide && currentVisibleSlide !== slide) {
+              pauseMediaInSlide(currentVisibleSlide);
+            }
+            currentVisibleSlide = slide;
+            playMediaInSlide(slide);
+          } else {
+            // si se va a invisibilidad y era el actual, pausarlo
+            if (currentVisibleSlide === slide && entry.intersectionRatio < 0.6) {
+              pauseMediaInSlide(slide);
+              currentVisibleSlide = null;
+            }
+          }
+        });
+      }, options);
+
+      slides.forEach((s) => io.observe(s));
+
+      function playMediaInSlide(slide) {
+        const media = slide.querySelector(".slide-media");
+        if (!media) return;
+        if (media.tagName.toLowerCase() === "video") {
+          // reproducir si está listo
+          if (media.readyState >= 2) {
+            media.play().catch(() => {
+              // algunos navegadores pueden bloquear play por políticas, pero estamos en muted/playsinline
+            });
+          } else {
+            // si no está listo, intentar cuando cargue metadata
+            const onLoaded = () => {
+              media.play().catch(() => {});
+              media.removeEventListener("loadedmetadata", onLoaded);
+            };
+            media.addEventListener("loadedmetadata", onLoaded);
+          }
+        }
+      }
+
+      function pauseMediaInSlide(slide) {
+        const media = slide.querySelector(".slide-media");
+        if (!media) return;
+        if (media.tagName.toLowerCase() === "video") {
+          try {
+            media.pause();
+            // resetear tiempo si querés que empiece desde 0 al volver:
+            // media.currentTime = 0;
+          } catch (e) {}
+        }
+      }
+
+      // Al cambiar de slide por Blaze (fallback), asegurar que solo el activo tenga video reproduciéndose.
+      // Blaze no expone un evento documentado universalmente, así que usamos polling suave para sincronizar:
+      let lastActiveIndex = -1;
+      setInterval(() => {
+        // calculamos el slide más centrado por la posición del track
+        // fallback: usar IntersectionObserver result (currentVisibleSlide)
+        if (currentVisibleSlide) {
+          slides.forEach((s) => {
+            if (s !== currentVisibleSlide) pauseMediaInSlide(s);
+          });
+        } else {
+          // si no hay visible (raro), pausamos todos
+          slides.forEach((s) => pauseMediaInSlide(s));
+        }
+      }, 1000);
+
+      // Evitar que los videos sigan reproduciéndose al ocultar la pestaña
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          slides.forEach((s) => pauseMediaInSlide(s));
+        } else {
+          if (currentVisibleSlide) playMediaInSlide(currentVisibleSlide);
+        }
       });
     </script>
   </body>
