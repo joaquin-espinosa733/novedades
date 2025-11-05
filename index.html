@@ -93,10 +93,9 @@
         all: {
           loop: true,
           slidesToShow: 1,
+          enableAutoplay: true,
           transitionDuration: 800,
-          autoplay: true,
           autoplayInterval: 7000,
-          stopAutoplayOnInteraction: false,
         },
       });
 
@@ -134,7 +133,10 @@
             playMediaInSlide(slide);
           } else {
             // si se va a invisibilidad y era el actual, pausarlo
-            if (currentVisibleSlide === slide && entry.intersectionRatio < 0.6) {
+            if (
+              currentVisibleSlide === slide &&
+              entry.intersectionRatio < 0.6
+            ) {
               pauseMediaInSlide(slide);
               currentVisibleSlide = null;
             }
