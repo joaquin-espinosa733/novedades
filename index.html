@@ -18,61 +18,7 @@
     <div class="blaze-slider" id="news-slider">
       <div class="blaze-container">
         <div class="blaze-track">
-          <!-- SLIDE 1 - imagen -->
-          <div class="slide">
-            <img
-              class="slide-media"
-              src="./assets/img/Logo-Sute_page-0001.jpg"
-              alt="Slide imagen 1"
-              loading="lazy"
-            />
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon">📰</div>
-              <h2>Sindicato Unido de Trabajadores de la Educación</h2>
-              <p>
-                Fundado el 4 de julio de 1971. Coronel Plaza 556 M5500, Mendoza,
-                Argentina.
-              </p>
-            </div>
-          </div>
-
-          <!-- SLIDE 3 - imagen -->
-          <div class="slide">
-            <img
-              class="slide-media"
-              src="./assets/img/LOGO CASCOTE.png"
-              alt="Slide imagen 3"
-              loading="lazy"
-            />
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon">💼</div>
-              <h2>Cascote TV</h2>
-              <p>
-                Streaming de Mendoza al mundo... o bueno, a donde lleguemos
-                👀🎙️💻
-              </p>
-            </div>
-          </div>
-
-          <div class="slide">
-            <img
-              class="slide-media"
-              src="./assets/img/Bombas y bombinhas HYT.jpg"
-              alt="Slide imagen 3"
-              loading="lazy"
-            />
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon">✈️</div>
-              <h2>TURISMO</h2>
-              <p>
-                
-              </p>
-            </div>
-          </div>
-          <!-- SLIDE 2 - video -->
+          <!-- SLIDE - video -->
           <div class="slide">
             <video
               class="slide-media"
@@ -86,11 +32,103 @@
             <div class="slide-content">
               <div class="icon"></div>
               <h2></h2>
+              <p></p>
+            </div>
+          </div>
+          <!-- SLIDE - imagen -->
+          <div class="slide">
+            <img
+              class="slide-media"
+              src="./assets/img/Pantalla Alejandro.jpg"
+              alt="Slide imagen 1"
+              loading="lazy"
+            />
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon">📰</div>
+              <h2>Alejandro Bercovich en la sede del SUTE</h2>
               <p>
+                El reconocido periodista y economista argentino dió una charla
+                este jueves, para delegados y delegadas del sindicato
+              </p>
+            </div>
+          </div>
+          <!-- SLIDE - imagen -->
+          <div class="slide">
+            <img
+              class="slide-media"
+              src="./assets/img/Pantalla Lavalle.jpg"
+              alt="Slide imagen 3"
+              loading="lazy"
+            />
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon">💼</div>
+              <h2>
+                Lavalle tiene sede propia: El SUTE abre las puertas de un nuevo
+                espacio, para afiliados y afiliadas del departamento
+              </h2>
+              <p>
+                Este sábado 04 de octubre el Sindicato Unido de los Trabajadores
+                de la Educación de Mendoza abre las puertas de una nueva sede,
+                en el camping del departamento de Lavalle.
+              </p>
+            </div>
+          </div>
+          <!-- SLIDE - imagen -->
+          <div class="slide">
+            <img
+              class="slide-media"
+              src="./assets/img/Pantalla Plenario.jpg"
+              alt="Slide imagen 3"
+              loading="lazy"
+            />
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon">✈️</div>
+              <h2>Balance 2024 - 2025</h2>
+              <p>
+                Se ponen a disposición de afiliados y público en general los
+                Estados Contables del Sindicato Unido de Trabajadores de la
+                Educación (SUTE) - Ejercicio 2024-2025
               </p>
             </div>
           </div>
 
+          <!-- SLIDE - video -->
+          <div class="slide">
+            <video
+              class="slide-media"
+              playsinline
+              muted
+              preload="metadata"
+              loop
+              src="./assets/img/pruebaUno.mp4"
+            ></video>
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon"></div>
+              <h2></h2>
+              <p></p>
+            </div>
+          </div>
+          <!-- SLIDE - video -->
+          <div class="slide">
+            <video
+              class="slide-media"
+              playsinline
+              muted
+              preload="metadata"
+              loop
+              src="./assets/img/pruebaDos.mp4"
+            ></video>
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <div class="icon"></div>
+              <h2></h2>
+              <p></p>
+            </div>
+          </div>
           <!-- Podés agregar más slides aquí (imagen o video) -->
         </div>
       </div>
@@ -112,109 +150,99 @@
         },
       });
 
-      // Manejo de reproducción de videos por visibilidad
-      // Observamos cada .slide; cuando su intersección > 0.6 lo consideramos visible.
       const slides = Array.from(document.querySelectorAll(".slide"));
+      let currentVideo = null;
 
-      const options = {
-        root: null,
-        rootMargin: "0px",
-        threshold: buildThresholdList(),
-      };
+      // 🔹 Observa los slides visibles
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const slide = entry.target;
+            const media = slide.querySelector(".slide-media");
 
-      function buildThresholdList() {
-        // lista de thresholds para mayor precisión
-        const thresholds = [];
-        for (let i = 0; i <= 1.0; i += 0.05) {
-          thresholds.push(i);
-        }
-        return thresholds;
-      }
+            if (entry.intersectionRatio >= 0.6) {
+              // Si es visible y tiene video
+              if (media && media.tagName.toLowerCase() === "video") {
+                // Detenemos autoplay
+                blaze.stopAutoplay?.();
 
-      let currentVisibleSlide = null;
-
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          const slide = entry.target;
-          // Si está mayormente visible:
-          if (entry.intersectionRatio >= 0.6) {
-            // marcar como visible
-            if (currentVisibleSlide && currentVisibleSlide !== slide) {
-              pauseMediaInSlide(currentVisibleSlide);
+                // Esperamos a que cargue metadatos
+                if (media.readyState >= 2) {
+                  startVideo(media);
+                } else {
+                  media.addEventListener(
+                    "loadedmetadata",
+                    () => startVideo(media),
+                    {
+                      once: true,
+                    }
+                  );
+                }
+              }
+            } else {
+              // Pausar al salir de vista
+              if (media && media.tagName.toLowerCase() === "video") {
+                media.pause();
+                media.currentTime = 0;
+                currentVideo = null;
+              }
             }
-            currentVisibleSlide = slide;
-            playMediaInSlide(slide);
-          } else {
-            // si se va a invisibilidad y era el actual, pausarlo
-            if (
-              currentVisibleSlide === slide &&
-              entry.intersectionRatio < 0.6
-            ) {
-              pauseMediaInSlide(slide);
-              currentVisibleSlide = null;
-            }
-          }
-        });
-      }, options);
+          });
+        },
+        { threshold: [0.6] }
+      );
 
       slides.forEach((s) => io.observe(s));
 
-      function playMediaInSlide(slide) {
-        const media = slide.querySelector(".slide-media");
-        if (!media) return;
-        if (media.tagName.toLowerCase() === "video") {
-          // reproducir si está listo
+      window.addEventListener("load", () => {
+        const activeSlide =
+          document.querySelector(".blaze-active") || slides[0];
+        const media = activeSlide?.querySelector(".slide-media");
+
+        if (media && media.tagName.toLowerCase() === "video") {
+          console.log("🎬 Reproduciendo video inicial:", media.src);
+          blaze.stopAutoplay?.();
+
           if (media.readyState >= 2) {
-            media.play().catch(() => {
-              // algunos navegadores pueden bloquear play por políticas, pero estamos en muted/playsinline
-            });
+            startVideo(media);
           } else {
-            // si no está listo, intentar cuando cargue metadata
-            const onLoaded = () => {
-              media.play().catch(() => {});
-              media.removeEventListener("loadedmetadata", onLoaded);
-            };
-            media.addEventListener("loadedmetadata", onLoaded);
+            media.addEventListener("loadedmetadata", () => startVideo(media), {
+              once: true,
+            });
           }
         }
-      }
-
-      function pauseMediaInSlide(slide) {
-        const media = slide.querySelector(".slide-media");
-        if (!media) return;
-        if (media.tagName.toLowerCase() === "video") {
-          try {
-            media.pause();
-            // resetear tiempo si querés que empiece desde 0 al volver:
-            // media.currentTime = 0;
-          } catch (e) {}
-        }
-      }
-
-      // Al cambiar de slide por Blaze (fallback), asegurar que solo el activo tenga video reproduciéndose.
-      // Blaze no expone un evento documentado universalmente, así que usamos polling suave para sincronizar:
-      let lastActiveIndex = -1;
-      setInterval(() => {
-        // calculamos el slide más centrado por la posición del track
-        // fallback: usar IntersectionObserver result (currentVisibleSlide)
-        if (currentVisibleSlide) {
-          slides.forEach((s) => {
-            if (s !== currentVisibleSlide) pauseMediaInSlide(s);
-          });
-        } else {
-          // si no hay visible (raro), pausamos todos
-          slides.forEach((s) => pauseMediaInSlide(s));
-        }
-      }, 1000);
-
-      // Evitar que los videos sigan reproduciéndose al ocultar la pestaña
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-          slides.forEach((s) => pauseMediaInSlide(s));
-        } else {
-          if (currentVisibleSlide) playMediaInSlide(currentVisibleSlide);
-        }
       });
+
+      function startVideo(media) {
+        if (currentVideo === media) return;
+        currentVideo = media;
+        console.log("▶️ Reproduciendo video:", media.src);
+
+        media.play().catch(() => {});
+
+        // Cuando termina el video
+        media.onended = () => {
+          console.log("✅ Video terminado:", media.src);
+          currentVideo = null;
+
+          // Avanza al siguiente slide
+          blaze.next?.();
+        };
+
+        // Backup: si el evento onended no dispara (por algún bug),
+        // detectamos el fin manualmente
+        const checkEnd = setInterval(() => {
+          if (!currentVideo) {
+            clearInterval(checkEnd);
+            return;
+          }
+          if (media.duration && media.currentTime >= media.duration - 0.3) {
+            clearInterval(checkEnd);
+            console.log("⚡ Fin detectado manualmente:", media.src);
+            media.onended?.();
+          }
+        }, 300);
+      }
     </script>
   </body>
 </html>
