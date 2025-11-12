@@ -41,7 +41,7 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain; /* muestra toda la imagen sin cortar */
+  object-fit: cover; /* muestra toda la imagen sin cortar */
   background-color: #000; /* fondo negro en caso de franjas */
   z-index: 1;
 }
