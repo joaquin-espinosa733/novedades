@@ -1,0 +1,113 @@
+/* reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* full-bleed */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* que el slider y sus elementos ocupen todo el viewport */
+.blaze-slider,
+.blaze-container,
+.blaze-track {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* cada slide es full-screen */
+.slide {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* media (imagen o video) cubre todo sin deformar */
+.slide-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* muestra toda la imagen sin cortar */
+  background-color: #000; /* fondo negro en caso de franjas */
+  z-index: 1;
+}
+
+/* overlay para contrastar texto */
+.slide-overlay {
+    position: absolute;
+    inset: 0;
+    /* background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.45) 60%, rgba(0, 0, 0, 0.6) 100%); */
+    z-index: 2;
+}
+
+/* contenido centrado */
+.slide-content {
+    position: relative;
+    z-index: 3;
+    max-width: 1200px;
+    padding: 2.5rem;
+    text-align: center;
+    color: #fff;
+    backdrop-filter: none;
+}
+
+/* icono grande */
+.icon {
+    font-size: 5.2rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+}
+
+/* título y texto legible en distancia */
+h2 {
+    font-size: 3.2rem;
+    line-height: 1.05;
+    margin-bottom: 1rem;
+    color: #9fe6ff;
+    text-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+p {
+    font-size: 1.45rem;
+    line-height: 1.6;
+    color: #e7eef6;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+}
+
+/* ocultar controles/paginación para modo TV */
+.blaze-pagination,
+.blaze-prev,
+.blaze-next {
+    display: none !important;
+}
+
+/* responsivo: ajustar tipografías en pantallas pequeñas */
+@media (max-width: 800px) {
+    .icon {
+        font-size: 4rem;
+    }
+
+    h2 {
+        font-size: 2.2rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+}
