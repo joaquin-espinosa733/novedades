@@ -5,225 +5,138 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Novedades - Fullscreen Slider</title>
 
-    <!-- Blaze Slider CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/blaze-slider@latest/dist/blaze.css"
-    />
-
-    <!-- Tus estilos -->
+    <link rel="stylesheet" href="https://unpkg.com/blaze-slider@latest/dist/blaze.css" />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
+
   <body>
     <div class="blaze-slider" id="news-slider">
       <div class="blaze-container">
-        <div class="blaze-track">
-          <!-- SLIDE - video -->
-          <div class="slide">
-            <video
-              class="slide-media"
-              playsinline
-              muted
-              preload="metadata"
-              loop
-              src="./assets/img/pruebaTres.mp4"
-            ></video>
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon"></div>
-              <h2></h2>
-              <p></p>
-            </div>
-          </div>
-          <!-- SLIDE - video -->
-          <!-- <div class="slide">
-            <video
-              class="slide-media"
-              playsinline
-              muted
-              preload="metadata"
-              loop
-              src="./assets/img/pruebaTres.mp4"
-            ></video>
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon"></div>
-              <h2></h2>
-              <p></p>
-            </div>
-          </div> -->
-          <!-- SLIDE - imagen -->
-          <!-- <div class="slide">
-            <img
-              class="slide-media"
-              src="./assets/img/Pantalla Alejandro.jpg"
-              alt="Slide imagen 1"
-              loading="lazy"
-            />
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon">📰</div>
-              <h2>Alejandro Bercovich en la sede del SUTE</h2>
-              <p>
-                El reconocido periodista y economista argentino dió una charla
-                este jueves, para delegados y delegadas del sindicato
-              </p>
-            </div>
-          </div> -->
-          <!-- SLIDE - imagen -->
-          <!-- <div class="slide">
-            <img
-              class="slide-media"
-              src="./assets/img/Pantalla Lavalle.jpg"
-              alt="Slide imagen 3"
-              loading="lazy"
-            />
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon">💼</div>
-              <h2>
-                Lavalle tiene sede propia: El SUTE abre las puertas de un nuevo
-                espacio, para afiliados y afiliadas del departamento
-              </h2>
-              <p>
-                Este sábado 04 de octubre el Sindicato Unido de los Trabajadores
-                de la Educación de Mendoza abre las puertas de una nueva sede,
-                en el camping del departamento de Lavalle.
-              </p>
-            </div>
-          </div> -->
-          <!-- SLIDE - imagen -->
-          <!-- <div class="slide">
-            <img
-              class="slide-media"
-              src="./assets/img/Pantalla Plenario.jpg"
-              alt="Slide imagen 3"
-              loading="lazy"
-            />
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon">✈️</div>
-              <h2>Balance 2024 - 2025</h2>
-              <p>
-                Se ponen a disposición de afiliados y público en general los
-                Estados Contables del Sindicato Unido de Trabajadores de la
-                Educación (SUTE) - Ejercicio 2024-2025
-              </p>
-            </div>
-          </div> -->
-
-          <!-- SLIDE - video -->
-          <!-- <div class="slide">
-            <video
-              class="slide-media"
-              playsinline
-              muted
-              preload="metadata"
-              loop
-              src="./assets/img/pruebaUno.mp4"
-            ></video>
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <div class="icon"></div>
-              <h2></h2>
-              <p></p>
-            </div>
-          </div> -->
-          <!-- Podés agregar más slides aquí (imagen o video) -->
+        <div class="blaze-track" id="slides-container">
+          <!-- 🔥 Las slides se agregan dinámicamente -->
         </div>
       </div>
     </div>
 
-    <!-- Blaze Slider JS (production) -->
     <script src="https://unpkg.com/blaze-slider@latest/dist/blaze-slider.min.js"></script>
 
     <script>
-      // Inicializa Blaze
       const sliderEl = document.querySelector("#news-slider");
-      const blaze = new BlazeSlider(sliderEl, {
-        all: {
-          loop: true,
-          slidesToShow: 1,
-          enableAutoplay: true,
-          transitionDuration: 800,
-          autoplayInterval: 7000,
-        },
-      });
+      const slidesContainer = document.querySelector("#slides-container");
 
-      const slides = Array.from(document.querySelectorAll(".slide"));
-      let currentVideo = null;
+      // 🚀 1) Traemos los videos desde tu API
+      async function loadSlides() {
+        try {
+          const res = await fetch("https://back-slider.onrender.com//traer"); 
+          const videos = await res.json(); 
 
-      // 🔹 Observa los slides visibles
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            const slide = entry.target;
-            const media = slide.querySelector(".slide-media");
+          console.log("🎥 Videos obtenidos:", videos);
 
-            if (entry.intersectionRatio >= 0.6) {
-              // Si es visible y tiene video
-              if (media && media.tagName.toLowerCase() === "video") {
-                // Detenemos autoplay
-                blaze.stopAutoplay?.();
+          videos.forEach((video) => {
+            const slide = document.createElement("div");
+            slide.classList.add("slide");
 
-                // Esperamos a que cargue metadatos
-                if (media.readyState >= 2) {
-                  startVideo(media);
-                } else {
-                  media.addEventListener(
-                    "loadedmetadata",
-                    () => startVideo(media),
-                    {
-                      once: true,
-                    }
-                  );
+            slide.innerHTML = `
+              <video
+                class="slide-media"
+                playsinline
+                muted
+                preload="metadata"
+                loop
+                src="${video.url}"   <!-- URL del video en Cloudflare -->
+              ></video>
+              <div class="slide-overlay"></div>
+              <div class="slide-content">
+                <div class="icon"></div>
+                <h2></h2>
+                <p></p>
+              </div>
+            `;
+
+            slidesContainer.appendChild(slide);
+          });
+
+          initSliderLogic();
+        } catch (err) {
+          console.error("❌ Error cargando videos:", err);
+        }
+      }
+
+      // 🚀 2) Lógica original: Blaze + Observer 
+      function initSliderLogic() {
+        const blaze = new BlazeSlider(sliderEl, {
+          all: {
+            loop: true,
+            slidesToShow: 1,
+            enableAutoplay: true,
+            transitionDuration: 800,
+            autoplayInterval: 7000,
+          },
+        });
+
+        const slides = Array.from(document.querySelectorAll(".slide"));
+        let currentVideo = null;
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const slide = entry.target;
+              const media = slide.querySelector(".slide-media");
+
+              if (entry.intersectionRatio >= 0.6) {
+                if (media && media.tagName.toLowerCase() === "video") {
+                  blaze.stopAutoplay?.();
+
+                  if (media.readyState >= 2) {
+                    startVideo(media, blaze);
+                  } else {
+                    media.addEventListener(
+                      "loadedmetadata",
+                      () => startVideo(media, blaze),
+                      { once: true }
+                    );
+                  }
+                }
+              } else {
+                if (media && media.tagName.toLowerCase() === "video") {
+                  media.pause();
+                  media.currentTime = 0;
+                  currentVideo = null;
                 }
               }
-            } else {
-              // Pausar al salir de vista
-              if (media && media.tagName.toLowerCase() === "video") {
-                media.pause();
-                media.currentTime = 0;
-                currentVideo = null;
-              }
+            });
+          },
+          { threshold: [0.6] }
+        );
+
+        slides.forEach((s) => io.observe(s));
+
+        function startVideo(media, blaze) {
+          if (currentVideo === media) return;
+          currentVideo = media;
+
+          media.play().catch(() => {});
+
+          media.onended = () => {
+            currentVideo = null;
+            blaze.next?.();
+          };
+
+          const checkEnd = setInterval(() => {
+            if (!currentVideo) {
+              clearInterval(checkEnd);
+              return;
             }
-          });
-        },
-        { threshold: [0.6] }
-      );
-
-      slides.forEach((s) => io.observe(s));
-
-      function startVideo(media) {
-        if (currentVideo === media) return;
-        currentVideo = media;
-        console.log("▶️ Reproduciendo video:", media.src);
-
-        media.play().catch(() => {});
-
-        // Cuando termina el video
-        media.onended = () => {
-          console.log("✅ Video terminado:", media.src);
-          currentVideo = null;
-
-          // Avanza al siguiente slide
-          blaze.next?.();
-        };
-
-        // Backup: si el evento onended no dispara (por algún bug),
-        // detectamos el fin manualmente
-        const checkEnd = setInterval(() => {
-          if (!currentVideo) {
-            clearInterval(checkEnd);
-            return;
-          }
-          if (media.duration && media.currentTime >= media.duration - 0.3) {
-            clearInterval(checkEnd);
-            console.log("⚡ Fin detectado manualmente:", media.src);
-            media.onended?.();
-          }
-        }, 300);
+            if (media.duration && media.currentTime >= media.duration - 0.3) {
+              clearInterval(checkEnd);
+              media.onended?.();
+            }
+          }, 300);
+        }
       }
+
+      // 🚀 Iniciar todo
+      loadSlides();
     </script>
   </body>
 </html>
