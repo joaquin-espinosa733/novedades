@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Novedades - Fullscreen Slider</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/blaze-slider@latest/dist/blaze.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/blaze-slider@latest/dist/blaze.css"
+    />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
 
@@ -13,21 +16,6 @@
     <div class="blaze-slider" id="news-slider">
       <div class="blaze-container">
         <div class="blaze-track" id="slides-container">
-          <div class="slide">
-          <video
-                class="slide-media"
-                playsinline
-                muted
-                preload="metadata"
-                controls
-                src="./assets/img/Logo Sute Blanco.mp4"   
-              ></video>
-              <div class="slide-overlay"></div>
-              <div class="slide-content">
-                <div class="icon"></div>
-                <h2></h2>
-                <p></p>
-              </div>
           <!-- 🔥 Las slides se agregan dinámicamente -->
         </div>
       </div>
@@ -42,8 +30,8 @@
       // 🚀 1) Traemos los videos desde tu API
       async function loadSlides() {
         try {
-          const res = await fetch("https://back-slider.onrender.com/traer"); 
-          const videos = await res.json(); 
+          const res = await fetch("https://back-slider.onrender.com/traer");
+          const videos = await res.json();
 
           console.log("🎥 Videos obtenidos:", videos);
 
@@ -57,7 +45,6 @@
                 playsinline
                 muted
                 preload="metadata"
-                loop
                 controls
                 src="${video.url}"   <!-- URL del video en Cloudflare -->
               ></video>
@@ -68,7 +55,13 @@
                 <p></p>
               </div>
             `;
-
+            const media = slide.querySelector(".slide-media");
+            media.addEventListener("play", () => {
+              // Cuando el usuario da play, desbloquea autoplay para todos los demás
+              slidesContainer.querySelectorAll(".slide-media").forEach((v) => {
+                if (v !== media) v.play().catch(() => {});
+              });
+            });
             slidesContainer.appendChild(slide);
           });
 
@@ -78,7 +71,7 @@
         }
       }
 
-      // 🚀 2) Lógica original: Blaze + Observer 
+      // 🚀 2) Lógica original: Blaze + Observer
       function initSliderLogic() {
         const blaze = new BlazeSlider(sliderEl, {
           all: {
