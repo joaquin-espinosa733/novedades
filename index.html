@@ -1,94 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Novedades - Slider Simple</title>
-
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-    }
-
-    .slide {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: none; /* solo uno visible */
-      background: black;
-    }
-
-    .slide video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .active {
-      display: block !important;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Reproductor TV Compatible</title>
+<style>
+  body { background: #000; margin: 0; }
+  video { width: 100%; height: auto; }
+</style>
 </head>
-
 <body>
-  <div id="slides-container"></div>
 
-  <script>
-    async function loadSlides() {
-      const res = await fetch("https://back-slider.onrender.com/traer");
-      const videos = await res.json();
+<video controls preload="auto">
+  <source src="./assets/img/CascoteTV.mp4" type="video/mp4">
+  Tu televisor no soporta reproducción de video.
+</video>
 
-      const container = document.querySelector("#slides-container");
-
-      videos.forEach((video, index) => {
-        const slide = document.createElement("div");
-        slide.className = "slide" + (index === 0 ? " active" : "");
-
-        slide.innerHTML = `
-          <video 
-            src="${video.url}"
-            playsinline
-            muted
-            controls
-            preload="metadata"
-          ></video>
-        `;
-
-        container.appendChild(slide);
-      });
-
-      startSimpleSlider();
-    }
-
-    function startSimpleSlider() {
-      const slides = Array.from(document.querySelectorAll(".slide"));
-      let current = 0;
-
-      function playCurrent() {
-        const slide = slides[current];
-        const video = slide.querySelector("video");
-
-        slide.classList.add("active");
-        video.currentTime = 0;
-        video.play().catch(() => {});
-
-        video.onended = () => {
-          slide.classList.remove("active");
-
-          current = (current + 1) % slides.length;
-
-          playCurrent();
-        };
-      }
-
-      playCurrent();
-    }
-
-    loadSlides();
-  </script>
 </body>
 </html>
