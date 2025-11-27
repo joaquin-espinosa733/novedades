@@ -1,142 +1,94 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Novedades - Fullscreen Slider</title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Novedades - Slider Simple</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/blaze-slider@latest/dist/blaze.css" />
-    <link rel="stylesheet" href="css/styles.css" />
-  </head>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+    }
 
-  <body>
-    <div class="blaze-slider" id="news-slider">
-      <div class="blaze-container">
-        <div class="blaze-track" id="slides-container">
-          <!-- 🔥 Las slides se agregan dinámicamente -->
-        </div>
-      </div>
-    </div>
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: none; /* solo uno visible */
+      background: black;
+    }
 
-    <script src="https://unpkg.com/blaze-slider@latest/dist/blaze-slider.min.js"></script>
+    .slide video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    <script>
-      const sliderEl = document.querySelector("#news-slider");
-      const slidesContainer = document.querySelector("#slides-container");
+    .active {
+      display: block !important;
+    }
+  </style>
+</head>
 
-      // 🚀 1) Traemos los videos desde tu API
-      async function loadSlides() {
-        try {
-          const res = await fetch("https://back-slider.onrender.com/traer"); 
-          const videos = await res.json(); 
+<body>
+  <div id="slides-container"></div>
 
-          console.log("🎥 Videos obtenidos:", videos);
+  <script>
+    async function loadSlides() {
+      const res = await fetch("https://back-slider.onrender.com/traer");
+      const videos = await res.json();
 
-          videos.forEach((video) => {
-            const slide = document.createElement("div");
-            slide.classList.add("slide");
+      const container = document.querySelector("#slides-container");
 
-            slide.innerHTML = `
-              <video
-                class="slide-media"
-                playsinline
-                muted
-                preload="metadata"
-                loop
-                src="${video.url}"   <!-- URL del video en Cloudflare -->
-              ></video>
-              <div class="slide-overlay"></div>
-              <div class="slide-content">
-                <div class="icon"></div>
-                <h2></h2>
-                <p></p>
-              </div>
-            `;
+      videos.forEach((video, index) => {
+        const slide = document.createElement("div");
+        slide.className = "slide" + (index === 0 ? " active" : "");
 
-            slidesContainer.appendChild(slide);
-          });
+        slide.innerHTML = `
+          <video 
+            src="${video.url}"
+            playsinline
+            muted
+            controls
+            preload="metadata"
+          ></video>
+        `;
 
-          initSliderLogic();
-        } catch (err) {
-          console.error("❌ Error cargando videos:", err);
-        }
+        container.appendChild(slide);
+      });
+
+      startSimpleSlider();
+    }
+
+    function startSimpleSlider() {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      let current = 0;
+
+      function playCurrent() {
+        const slide = slides[current];
+        const video = slide.querySelector("video");
+
+        slide.classList.add("active");
+        video.currentTime = 0;
+        video.play().catch(() => {});
+
+        video.onended = () => {
+          slide.classList.remove("active");
+
+          current = (current + 1) % slides.length;
+
+          playCurrent();
+        };
       }
 
-      // 🚀 2) Lógica original: Blaze + Observer 
-      function initSliderLogic() {
-        const blaze = new BlazeSlider(sliderEl, {
-          all: {
-            loop: true,
-            slidesToShow: 1,
-            enableAutoplay: true,
-            transitionDuration: 800,
-            autoplayInterval: 7000,
-          },
-        });
+      playCurrent();
+    }
 
-        const slides = Array.from(document.querySelectorAll(".slide"));
-        let currentVideo = null;
-
-        const io = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              const slide = entry.target;
-              const media = slide.querySelector(".slide-media");
-
-              if (entry.intersectionRatio >= 0.6) {
-                if (media && media.tagName.toLowerCase() === "video") {
-                  blaze.stopAutoplay?.();
-
-                  if (media.readyState >= 2) {
-                    startVideo(media, blaze);
-                  } else {
-                    media.addEventListener(
-                      "loadedmetadata",
-                      () => startVideo(media, blaze),
-                      { once: true }
-                    );
-                  }
-                }
-              } else {
-                if (media && media.tagName.toLowerCase() === "video") {
-                  media.pause();
-                  media.currentTime = 0;
-                  currentVideo = null;
-                }
-              }
-            });
-          },
-          { threshold: [0.6] }
-        );
-
-        slides.forEach((s) => io.observe(s));
-
-        function startVideo(media, blaze) {
-          if (currentVideo === media) return;
-          currentVideo = media;
-
-          media.play().catch(() => {});
-
-          media.onended = () => {
-            currentVideo = null;
-            blaze.next?.();
-          };
-
-          const checkEnd = setInterval(() => {
-            if (!currentVideo) {
-              clearInterval(checkEnd);
-              return;
-            }
-            if (media.duration && media.currentTime >= media.duration - 0.3) {
-              clearInterval(checkEnd);
-              media.onended?.();
-            }
-          }, 300);
-        }
-      }
-
-      // 🚀 Iniciar todo
-      loadSlides();
-    </script>
-  </body>
+    loadSlides();
+  </script>
+</body>
 </html>
