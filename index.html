@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="styles.css">
-  <title>Novedades - Slider Simple</title>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <title>Novedades - Slider Simple</title>
+  </head>
 
-<body>
-  <div id="slides-container"></div>
+  <body>
+    <div id="slides-container"></div>
 
-  <script>
-    async function loadSlides() {
-      const res = await fetch("https://back-slider.onrender.com/traer");
-      const videos = await res.json();
+    <script>
+      async function loadSlides() {
+        const res = await fetch("https://back-slider.onrender.com/traer");
+        const videos = await res.json();
 
-      const container = document.querySelector("#slides-container");
+        const container = document.querySelector("#slides-container");
 
-      videos.forEach((video, index) => {
-        const slide = document.createElement("div");
-        slide.className = "slide" + (index === 0 ? " active" : "");
+        videos.forEach((video, index) => {
+          const slide = document.createElement("div");
+          slide.className = "slide" + (index === 0 ? " active" : "");
 
-        slide.innerHTML = `
+          slide.innerHTML = `
           <video 
             src="${video.url}"
             playsinline
@@ -30,37 +30,37 @@
           ></video>
         `;
 
-        container.appendChild(slide);
-      });
+          container.appendChild(slide);
+        });
 
-      startSimpleSlider();
-    }
-
-    function startSimpleSlider() {
-      const slides = Array.from(document.querySelectorAll(".slide"));
-      let current = 0;
-
-      function playCurrent() {
-        const slide = slides[current];
-        const video = slide.querySelector("video");
-
-        slide.classList.add("active");
-        video.currentTime = 0;
-        video.play().catch(() => {});
-
-        video.onended = () => {
-          slide.classList.remove("active");
-
-          current = (current + 1) % slides.length;
-
-          playCurrent();
-        };
+        startSimpleSlider();
       }
 
-      playCurrent();
-    }
+      function startSimpleSlider() {
+        const slides = Array.from(document.querySelectorAll(".slide"));
+        let current = 0;
 
-    loadSlides();
-  </script>
-</body>
+        function playCurrent() {
+          const slide = slides[current];
+          const video = slide.querySelector("video");
+
+          slide.classList.add("active");
+          video.currentTime = 0;
+          video.play().catch(() => {});
+
+          video.onended = () => {
+            slide.classList.remove("active");
+
+            current = (current + 1) % slides.length;
+
+            playCurrent();
+          };
+        }
+
+        playCurrent();
+      }
+
+      loadSlides();
+    </script>
+  </body>
 </html>
