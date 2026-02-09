@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
@@ -11,33 +11,51 @@
     <div id="slides-container"></div>
 
     <script>
+      const BACKEND_URL = "https://back-slider.onrender.com";
+
+      // ===============================
+      // Carga inicial de videos
+      // ===============================
       async function loadSlides() {
-        const res = await fetch("https://back-slider.onrender.com/traer");
-        const videos = await res.json();
+        try {
+          const res = await fetch(`${BACKEND_URL}/traer`, {
+            cache: "no-store",
+          });
 
-        const container = document.querySelector("#slides-container");
+          const videos = await res.json();
+          const container = document.querySelector("#slides-container");
 
-        videos.forEach((video, index) => {
-          const slide = document.createElement("div");
-          slide.className = "slide" + (index === 0 ? " active" : "");
+          container.innerHTML = "";
 
-          slide.innerHTML = `
-          <video 
-            src="${video.url}"
-            playsinline
-            muted
-            preload="metadata"
-          ></video>
-        `;
+          videos.forEach((video, index) => {
+            const slide = document.createElement("div");
+            slide.className = "slide" + (index === 0 ? " active" : "");
 
-          container.appendChild(slide);
-        });
+            slide.innerHTML = `
+              <video 
+                src="${video.url}"
+                playsinline
+                muted
+                preload="metadata"
+              ></video>
+            `;
 
-        startSimpleSlider();
+            container.appendChild(slide);
+          });
+
+          startSimpleSlider();
+        } catch (err) {
+          console.error("Error cargando videos:", err);
+        }
       }
 
+      // ===============================
+      // Slider simple en loop
+      // ===============================
       function startSimpleSlider() {
         const slides = Array.from(document.querySelectorAll(".slide"));
+        if (slides.length === 0) return;
+
         let current = 0;
 
         function playCurrent() {
@@ -46,13 +64,12 @@
 
           slide.classList.add("active");
           video.currentTime = 0;
+
           video.play().catch(() => {});
 
           video.onended = () => {
             slide.classList.remove("active");
-
             current = (current + 1) % slides.length;
-
             playCurrent();
           };
         }
@@ -60,7 +77,26 @@
         playCurrent();
       }
 
+      // ===============================
+      // Latido para que Render no duerma
+      // ===============================
+      async function keepBackendAwake() {
+        try {
+          await fetch(`${BACKEND_URL}/health`, {
+            cache: "no-store",
+          });
+        } catch (_) {
+          // Silencio elegante: si falla, no rompemos nada
+        }
+      }
+
+      // ===============================
+      // Inicio
+      // ===============================
       loadSlides();
+
+      // Cada 5 minutos mantenemos vivo el backend
+      setInterval(keepBackendAwake, 5 * 60 * 1000);
     </script>
   </body>
 </html>
